@@ -4,7 +4,7 @@ const {client_db} = require('./configPG.js')
 const route_query = {
     verify_free_credit : {
         func : async (oo)=>{
-            const {ip_address} = oo;
+            const {ip_address} = oo; 
             const query = {
                 text : 'SELECT update_mesaje_trimise_gratis($1) AS result;',
                 values: [ip_address]
