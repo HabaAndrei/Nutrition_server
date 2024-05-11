@@ -11,7 +11,7 @@ const route_query = {
             }
             return await client_db.query(query);
         },
-        required_params : ['ip_address']
+        require_params : ['ip_address']
     },
     delete_user : {
         func : async(oo)=>{
@@ -21,8 +21,9 @@ const route_query = {
                 values: [uid]
             }
             return await client_db.query(query);
+        },
+        require_params : ['uid']
 
-        }
     },
     insert_date_u : {
         func : async(oo)=>{
@@ -47,15 +48,42 @@ const route_query = {
                 values : []
             };
             return await client_db.query(query);
-        }
+        },
+        require_params: ['uid', 'email', 'name', 'milisec', 'metoda_creare']
     }
 }
 
-function DBcall(func_str, params){
+function check_required_params(paramsIn, paramsReq){
+    let rez ;
+    const keys= Object.keys(paramsIn);
+    const missing_req_params = paramsReq?.filter((req_pa)=> !keys.includes(req_pa));
+    if(missing_req_params?.length){
+        rez = {status: false, params: missing_req_params}
+    }else{
+        rez = {status: true}
+    }
+    return rez;
+}
+
+async function DBcall (func_str, params={}){
     let res;
 
+
+
     try{
-        res = route_query[func_str].func(params)
+        if(typeof route_query[func_str].func != 'function')return console.error(`Function ${func_str} does not exist in route_query `);
+        const pa_rams = route_query[func_str].require_params;
+
+        // console.log({pa_rams, params})
+        const ob_verif = check_required_params(params, pa_rams);
+        // console.log(ob_verif)
+        if(!ob_verif.status){
+            throw new Error(`${func_str}: Missing parameter: ${ob_verif.params?.join(', ')}`);
+
+        }
+ 
+        let rezult = await route_query[func_str].func(params);
+        res = {error:false, res: rezult};
     }catch(err){
         res = {error: true};
     }

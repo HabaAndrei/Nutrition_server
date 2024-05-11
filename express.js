@@ -19,7 +19,8 @@ app.post('/insertDateU_google', async (req, res)=>{
     // uid: user.uid, email:user.email, name: user.displayName, milisec,  metoda_creare: 'google'
     const {uid, email, name, milisec, metoda_creare} = req.body;
     try{
-        await DBcall('delete_user', {uid, email, name, milisec, metoda_creare});
+        let rez = await DBcall('insert_date_u', {uid, email, name, milisec, metoda_creare});
+        if(rez.error)res.status(404).send();
     }catch (err){
         res.status(500).send;
     }
@@ -30,7 +31,8 @@ app.post('/insertDateU_google', async (req, res)=>{
 app.post('/stergemUtilizatorul', async (req, res)=>{
     const {uid} = req.body;
     try{
-        await DBcall('delete_user', {uid});
+        let rez = await DBcall('delete_user', {uid});
+        if(rez.error)res.status(404).send();
     }catch (err){
         res.status(500).send;
     }
@@ -44,8 +46,9 @@ app.post('/verificamCrediteGratis', async (req, res)=>{
     const {ip_address} = req.body;
     let rez ;
     try{
-        rez =  await DBcall('verify_free_credit', {ip_address});
-        res.send(rez.rows)
+        rez = await DBcall('verify_free_credit', {ip_address});
+        if(!rez.error)res.send(rez.res.rows)
+        if(rez.error)res.status(404).send();
     }catch (err){
         res.status(500).send();
     }    
