@@ -25,6 +25,35 @@ const route_query = {
         require_params : ['uid']
 
     },
+    store_messages: {
+        func : async (oo)=>{
+            const {arMes} = oo;
+            const query = {
+                text:  `
+                INSERT INTO mesaje (mesaj, tip_mesaj, data, id_conversatie, conversatie, uid)
+                SELECT (json_data->>'mesaj')::text, (json_data->>'tip_mesaj')::text, (json_data->>'data')::numeric,
+                (json_data->>'id_conversatie')::text,  (json_data->>'conversatie')::text, (json_data->>'uid')::text
+                FROM json_array_elements($1::json) AS json_data`,
+                values : [JSON.stringify(arMes)]
+            }
+            return await client_db.query(query);
+        },
+        require_params : []
+    },
+    getConvWithId:{
+        func: async(oo)=>{
+            const {id_conversatie} = oo;
+            const query = {
+                text: `
+                select mesaj, tip_mesaj from mesaje where id_conversatie = $1 order by id
+                `,
+                values: [id_conversatie]
+            }
+            return await client_db.query(query);
+
+        },
+        require_params: ['id_conversatie']
+    },
     insert_date_u : {
         func : async(oo)=>{
             const {uid, email, name, milisec, metoda_creare} = oo;
@@ -50,6 +79,22 @@ const route_query = {
             return await client_db.query(query);
         },
         require_params: ['uid', 'email', 'name', 'milisec', 'metoda_creare']
+    }, 
+    getConvFromDB: {
+        func: async(oo)=>{
+            const {conversatie, uid} = oo;
+            const query = {
+                text: `
+                select  mes_2.mesaj, mes_2.id_conversatie,  mes_2.tip_mesaj from mesaje mes_2
+                join (select min(id) from mesaje where conversatie = $1 and uid = $2
+                group by id_conversatie) mes_1 on mes_1.min = mes_2.id
+                `,
+                values: [conversatie, uid]
+            }
+            return await client_db.query(query);
+
+        },
+        require_params: ['conversatie', 'uid']
     }
 }
 
@@ -76,7 +121,6 @@ async function DBcall (func_str, params={}){
 
         // console.log({pa_rams, params})
         const ob_verif = check_required_params(params, pa_rams);
-        // console.log(ob_verif)
         if(!ob_verif.status){
             throw new Error(`${func_str}: Missing parameter: ${ob_verif.params?.join(', ')}`);
 

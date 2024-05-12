@@ -40,6 +40,28 @@ app.post('/stergemUtilizatorul', async (req, res)=>{
     
 })
 
+app.post('/stocamMesajele', async (req, res)=>{
+
+
+    const {arMes, id_conversatie, data, uid, conversatie} = req.body;
+    let ar = []
+
+    for(obiect of arMes){
+        obiect.id_conversatie = id_conversatie;
+        obiect.data = data;
+        obiect.conversatie = conversatie;
+        obiect.uid = uid;
+        ar.push(obiect);
+    }
+    
+    try{
+        let rez = await DBcall('store_messages', {arMes : ar});
+        if(rez.error)res.status(404).send();
+    }catch(err){
+        res.status(500).send;
+    }
+    res.send();
+})
 
 
 app.post('/verificamCrediteGratis', async (req, res)=>{
@@ -54,6 +76,29 @@ app.post('/verificamCrediteGratis', async (req, res)=>{
     }    
 })
 
+app.post('/getConvWithId', async(req, res)=>{
+    const {id_conversatie} = req.body;
+    let rez ;
+    try{
+        rez = await DBcall('getConvWithId', {id_conversatie});
+        if(!rez.error)res.send(rez.res.rows)
+        if(rez.error)res.status(404).send();
+    }catch (err){
+        res.status(500).send();
+    }  
+})
+
+app.post('/getConvFromDB', async (req, res)=>{
+    const {conversatie, uid} = req.body;
+    try{
+        rez = await DBcall('getConvFromDB', {conversatie, uid});
+        if(!rez.error)res.send(rez.res.rows)
+        if(rez.error)res.status(404).send();
+    }catch (err){
+        res.status(500).send();
+    } 
+
+})
 
 ///////////////
 
