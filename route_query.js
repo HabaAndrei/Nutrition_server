@@ -95,6 +95,20 @@ const route_query = {
 
         },
         require_params: ['conversatie', 'uid']
+    },
+    getMesFromDB: {
+        func: async(oo)=>{
+            const {id_conversatie} = oo;
+            const query = {
+                text: `
+                select mesaj, tip_mesaj from mesaje where id_conversatie = $1
+                `,
+                values: [id_conversatie]
+            }
+            return await client_db.query(query);
+
+        },
+        require_params: ['id_conversatie']
     }
 }
 

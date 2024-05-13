@@ -99,7 +99,16 @@ app.post('/getConvFromDB', async (req, res)=>{
     } 
 
 })
-
+app.post('/getMesFromDB', async(req, res)=>{
+    const {id_conversatie} = req.body;
+    try{
+        rez = await DBcall('getMesFromDB', {id_conversatie});
+        if(!rez.error)res.send(rez.res.rows)
+        if(rez.error)res.status(404).send();
+    }catch (err){
+        res.status(500).send();
+    } 
+})
 ///////////////
 
 const PORT = 5000;
