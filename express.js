@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
+const requestIp = require('request-ip')
 
 
 
@@ -65,7 +66,8 @@ app.post('/stocamMesajele', async (req, res)=>{
 
 
 app.post('/verificamCrediteGratis', async (req, res)=>{
-    const {ip_address} = req.body;
+    const ip_address = requestIp.getClientIp(req)
+
     let rez ;
     try{
         rez = await DBcall('verify_free_credit', {ip_address});
@@ -109,6 +111,17 @@ app.post('/getMesFromDB', async(req, res)=>{
         res.status(500).send();
     } 
 })
+app.post('/deleteConv', async(req, res)=>{
+    const {id_conversatie} = req.body;
+    try{
+        rez = await DBcall('deleteConv', {id_conversatie});
+        if(!rez.error)res.send(rez.res.rows)
+        if(rez.error)res.status(404).send();
+    }catch (err){
+        res.status(500).send();
+    } 
+})
+
 ///////////////
 
 const PORT = 5000;
