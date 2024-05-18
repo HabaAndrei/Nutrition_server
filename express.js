@@ -2,17 +2,19 @@ const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const requestIp = require('request-ip')
+const {pay_product_redirect} = require('./pay_redirect.js');
+const {catch_hooks} = require('./catch_hooks.js');
 
 
 
 
 const app = express();
 const {DBcall} = require('./route_query.js');
-// const {client_db} = require('./configPG.js')
-
 app.use(cors());
 app.use(bodyParser.json());
 
+catch_hooks(app);
+pay_product_redirect(app)
 
 ///////////////
 
