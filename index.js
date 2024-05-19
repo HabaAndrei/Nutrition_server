@@ -14,8 +14,8 @@ const {client_db} = require('./configPG.js')
 
 // return ;
 
-const ingrediente = `ingredients=100g+napkin,100g+nectar,100g+nectarine,100g+nibble,100g+noodles,100g+nosh,100g+nourish,100g+nourishment,100g+nut,100g+nutmeg,100g+nutrient,100g+nutrition,100g+nutritious,100g+oatmeal,100g+oats,100g+oil,100g+okra,100g+oleo,100g+olive,100g+omelet,100g+omnivore,100g+onion,100g+orange,100g+order,100g+oregano,100g+oven,100g+oyster`;
-axios.get(`https://api.apileague.com/compute-nutrition?api-key=1a94415d6e774882b2fd62156e01d674&${ingrediente}`)
+const ingrediente = `alcohols=100ml+absinthe,100ml+amaretto,100ml+aperol,100ml+aquavit,100ml+beer,100ml+bourbon,100ml+brandy,100ml+cachaça,100ml+calvados,100ml+champagne,100ml+cider,100ml+cognac,100ml+gin,100ml+grappa,100ml+madras,100ml+mai+tai,100ml+manhattan,100ml+margarita,100ml+mimosa,100ml+moscow+mule,100ml+negroni`;
+axios.get(`https://api.apileague.com/compute-nutrition?api-key=78298002a13e4e1993903fb079c758d3&${ingrediente}`)
 .then((data)=>{
 
     // const arCuObDeNutrienti = data.data.ingredient_breakdown[0].nutrients;
@@ -66,7 +66,7 @@ axios.get(`https://api.apileague.com/compute-nutrition?api-key=1a94415d6e774882b
         const numeAliment = obiect['name'].replace(/ /g, '_').toLocaleLowerCase();
         const arrayCuObDeNutrienti = obiect['nutrients'];
 
-        obNou.nume_aliment =  numeAliment;
+        obNou.food_name =  numeAliment;
         for(let ob of arrayCuObDeNutrienti){
             let n = ob.name.replace(/ /g, '_').toLocaleLowerCase();
             obNou[n] = ob.amount;
@@ -97,7 +97,7 @@ axios.get(`https://api.apileague.com/compute-nutrition?api-key=1a94415d6e774882b
             manganese, 
             mono_unsaturated_fat, 
             net_carbohydrates, 
-            nume_aliment, 
+            food_name, 
             phosphorus, 
             poly_unsaturated_fat, 
             potassium, 
@@ -136,7 +136,7 @@ axios.get(`https://api.apileague.com/compute-nutrition?api-key=1a94415d6e774882b
             (json_data->>'manganese')::numeric,
             (json_data->>'mono_unsaturated_fat')::numeric,
             (json_data->>'net_carbohydrates')::numeric,
-            (json_data->>'nume_aliment')::text, 
+            (json_data->>'food_name')::text, 
             (json_data->>'phosphorus')::numeric,
             (json_data->>'poly_unsaturated_fat')::numeric,
             (json_data->>'potassium')::numeric,
