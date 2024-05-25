@@ -17,12 +17,17 @@ const route_query = {
         func : async(oo)=>{
             const {uid} = oo;
             const query = {
-                text: 'delete from useri where uid = $1;',
-                values: [uid]
+                text: `
+                BEGIN;
+                delete from useri where uid = '${uid}'; 
+                delete from mesaje where uid = '${uid}';
+                COMMIT;
+                `,
+                values: []
             }
             return await client_db.query(query);
         },
-        require_params : ['uid']
+        require_params : []
 
     },
     store_messages: {
@@ -96,20 +101,20 @@ const route_query = {
         },
         require_params: ['conversatie', 'uid']
     },
-    getMesFromDB: {
-        func: async(oo)=>{
-            const {id_conversatie} = oo;
-            const query = {
-                text: `
-                select mesaj, tip_mesaj from mesaje where id_conversatie = $1
-                `,
-                values: [id_conversatie]
-            }
-            return await client_db.query(query);
+    // getMesFromDB: {
+    //     func: async(oo)=>{
+    //         const {id_conversatie} = oo;
+    //         const query = {
+    //             text: `
+    //             select mesaj, tip_mesaj from mesaje where id_conversatie = $1
+    //             `,
+    //             values: [id_conversatie]
+    //         }
+    //         return await client_db.query(query);
 
-        },
-        require_params: ['id_conversatie']
-    },
+    //     },
+    //     require_params: ['id_conversatie']
+    // },
     deleteConv: {
         func: async(oo)=>{
             const {id_conversatie} = oo;
@@ -123,6 +128,73 @@ const route_query = {
 
         },
         require_params: ['id_conversatie']
+    },
+    add_subscription: {
+        func: async(oo)=>{
+            const {email, id_abonament, pret_abonament, numar_tokeni, inceput_abonament, final_abonament, tip} = oo;
+            const query = {
+                text: `
+                DO $$
+                DECLARE 
+                  nr integer;
+                BEGIN 
+                  SELECT count(*) INTO nr 
+                  FROM date_abonament 
+                  WHERE id_abonament = '${id_abonament}' AND email = '${email}';
+      
+                  IF nr > 0 THEN
+                    -- Aici voi insera prelungirea de abonament 
+                    UPDATE date_abonament 
+                    SET final_abonament = '${final_abonament}', tip = '${tip}', 
+                        numar_tokeni = ${numar_tokeni}
+                    WHERE id_abonament = '${id_abonament}' AND email = '${email}';
+                  ELSE 
+                    -- Aici voi insera noul abonament 
+                    INSERT INTO date_abonament (email, id_abonament, pret_abonament, numar_tokeni, 
+                                                inceput_abonament, final_abonament, tip) 
+                    VALUES ('${email}', '${id_abonament}', ${pret_abonament}, ${numar_tokeni},
+                            '${inceput_abonament}', '${final_abonament}', '${tip}');
+                  END IF;
+                END $$;
+                `,
+                values: []
+            }
+            return await client_db.query(query);
+
+        },
+        require_params: [],
+    },
+    getDataUser: {
+        func: async(oo)=>{
+            const {email} = oo;
+            const query = {
+                text: `
+                
+                select inceput_abonament, final_abonament, id_abonament, pret_abonament, numar_tokeni 
+                from date_abonament where email = $1 and tip = 'activ';        
+                `,
+                values: [email]
+            }
+            return await client_db.query(query);
+
+        },
+        require_params: ['email']
+    },
+    deleteSubscription: {
+        func: async(oo)=>{
+            const {id} = oo;
+            const query = {
+                text: `
+                
+                update date_abonament set tip = 'inactiv'
+                where id_abonament = $1;       
+                `,
+                values: [id]
+            }
+            return await client_db.query(query);
+
+        },
+        require_params: ['id']
     }
 }
 
@@ -155,9 +227,10 @@ async function DBcall (func_str, params={}){
         }
  
         let rezult = await route_query[func_str].func(params);
+        // console.log(rezult, '\n', '\n')
         res = {error:false, res: rezult};
     }catch(err){
-        console.log(err)
+        console.log(err, '-------------------------')
         res = {error: true};
     }
     return res;

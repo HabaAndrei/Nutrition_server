@@ -1,14 +1,22 @@
 const express = require('express');
 const cors = require('cors');
+require('dotenv').config();
 const bodyParser = require('body-parser');
 const requestIp = require('request-ip')
+const fs = require("fs");
+const fileUpload = require("express-fileupload");
 const {pay_product_redirect} = require('./pay_redirect.js');
 const {catch_hooks} = require('./catch_hooks.js');
+const {client_db} = require('./configPG.js');
+const {SK_TEST }= process.env;
+const stripe = require('stripe')(SK_TEST);
 
 
 
 
 const app = express();
+app.use(fileUpload());
+app.use(express.static("./poze"));
 const {DBcall} = require('./route_query.js');
 app.use(cors());
 app.use(bodyParser.json());
@@ -36,6 +44,11 @@ app.post('/stergemUtilizatorul', async (req, res)=>{
     try{
         let rez = await DBcall('delete_user', {uid});
         if(rez.error)res.status(404).send();
+        try{
+            fs.unlinkSync(`./poze/${uid}.jpg`);
+        }catch(err){
+            console.log(err, 'eroarea mica!!!')
+        }
     }catch (err){
         res.status(500).send;
     }
@@ -103,16 +116,16 @@ app.post('/getConvFromDB', async (req, res)=>{
     } 
 
 })
-app.post('/getMesFromDB', async(req, res)=>{
-    const {id_conversatie} = req.body;
-    try{
-        rez = await DBcall('getMesFromDB', {id_conversatie});
-        if(!rez.error)res.send(rez.res.rows)
-        if(rez.error)res.status(404).send();
-    }catch (err){
-        res.status(500).send();
-    } 
-})
+// app.post('/getMesFromDB', async(req, res)=>{
+//     const {id_conversatie} = req.body;
+//     try{
+//         rez = await DBcall('getMesFromDB', {id_conversatie});
+//         if(!rez.error)res.send(rez.res.rows)
+//         if(rez.error)res.status(404).send();
+//     }catch (err){
+//         res.status(500).send();
+//     } 
+// })
 app.post('/deleteConv', async(req, res)=>{
     const {id_conversatie} = req.body;
     try{
@@ -124,6 +137,49 @@ app.post('/deleteConv', async(req, res)=>{
     } 
 })
 
+
+app.post('/uploadImg', (req, res)=>{
+    let uid = req.query.uid;
+
+    
+    fs.writeFile(
+        `./poze/${uid}.jpg`,
+        req.files.image.data,
+        (err) => {
+          if (err) {
+            console.log(err);
+            return res.send("eroare");
+          } else {
+            return res.send(`ok`);
+          }
+        }
+    );
+    
+})
+
+
+
+app.post('/getDataUser', async (req, res)=>{
+    const {email} = req.body;
+    try{
+        rez = await DBcall('getDataUser', {email});
+        
+        if(!rez.error)res.send(rez.res.rows)
+        if(rez.error)res.status(404).send();
+    }catch (err){
+        res.status(500).send();
+    } 
+})
+
+app.post(`/deleteSubscription`, async (req, res)=>{
+    const {id} = req.body;
+
+    const subscription = await stripe.subscriptions.cancel(id)
+    if(subscription.status != 'canceled'){res.status(500).send(); return};
+
+    res.send('');
+
+})
 ///////////////
 
 const PORT = 5000;
