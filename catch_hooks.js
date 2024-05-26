@@ -39,7 +39,7 @@ function catch_hooks(app){
           });
           if(rez.error)console.log('avem o eroare la adaugare de date in DB la abonament')
         }catch (err){
-          console.log(err, )
+          console.log(err)
         }    
 
         break;

@@ -101,20 +101,7 @@ const route_query = {
         },
         require_params: ['conversatie', 'uid']
     },
-    // getMesFromDB: {
-    //     func: async(oo)=>{
-    //         const {id_conversatie} = oo;
-    //         const query = {
-    //             text: `
-    //             select mesaj, tip_mesaj from mesaje where id_conversatie = $1
-    //             `,
-    //             values: [id_conversatie]
-    //         }
-    //         return await client_db.query(query);
 
-    //     },
-    //     require_params: ['id_conversatie']
-    // },
     deleteConv: {
         func: async(oo)=>{
             const {id_conversatie} = oo;
@@ -151,7 +138,7 @@ const route_query = {
                   ELSE 
                     -- Aici voi insera noul abonament 
                     INSERT INTO date_abonament (email, id_abonament, pret_abonament, numar_tokeni, 
-                                                inceput_abonament, final_abonament, tip) 
+                            inceput_abonament, final_abonament, tip) 
                     VALUES ('${email}', '${id_abonament}', ${pret_abonament}, ${numar_tokeni},
                             '${inceput_abonament}', '${final_abonament}', '${tip}');
                   END IF;
@@ -164,14 +151,14 @@ const route_query = {
         },
         require_params: [],
     },
-    getDataUser: {
+    getDataUser_abonamente: {
         func: async(oo)=>{
             const {email} = oo;
             const query = {
                 text: `
                 
                 select inceput_abonament, final_abonament, id_abonament, pret_abonament, numar_tokeni 
-                from date_abonament where email = $1 and tip = 'activ';        
+                from date_abonament where email = $1 and tip = 'activ' order by id;        
                 `,
                 values: [email]
             }
@@ -195,6 +182,24 @@ const route_query = {
 
         },
         require_params: ['id']
+    },
+    dropTokens : {
+        func: async(oo)=>{
+            const {numar_tokeni, id_abonament, uid} = oo;
+            const query = {
+                text: `
+                
+                BEGIN;
+                update date_abonament set numar_tokeni = ${numar_tokeni } where id_abonament = '${id_abonament}';    
+                insert into istoric_tokeni (uid, tokens) values ('${uid}', -1);
+                COMMIT;
+                `,
+                values: []
+            }
+            return await client_db.query(query);
+
+        },
+        require_params: ['numar_tokeni', 'id_abonament', 'uid']
     }
 }
 

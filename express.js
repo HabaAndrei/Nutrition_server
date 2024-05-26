@@ -116,16 +116,8 @@ app.post('/getConvFromDB', async (req, res)=>{
     } 
 
 })
-// app.post('/getMesFromDB', async(req, res)=>{
-//     const {id_conversatie} = req.body;
-//     try{
-//         rez = await DBcall('getMesFromDB', {id_conversatie});
-//         if(!rez.error)res.send(rez.res.rows)
-//         if(rez.error)res.status(404).send();
-//     }catch (err){
-//         res.status(500).send();
-//     } 
-// })
+
+
 app.post('/deleteConv', async(req, res)=>{
     const {id_conversatie} = req.body;
     try{
@@ -159,10 +151,10 @@ app.post('/uploadImg', (req, res)=>{
 
 
 
-app.post('/getDataUser', async (req, res)=>{
+app.post('/getDataUser_abonamente', async (req, res)=>{
     const {email} = req.body;
     try{
-        rez = await DBcall('getDataUser', {email});
+        rez = await DBcall('getDataUser_abonamente', {email});
         
         if(!rez.error)res.send(rez.res.rows)
         if(rez.error)res.status(404).send();
@@ -178,6 +170,23 @@ app.post(`/deleteSubscription`, async (req, res)=>{
     if(subscription.status != 'canceled'){res.status(500).send(); return};
 
     res.send('');
+
+})
+
+app.post('/dropTokens', async (req, res)=>{
+
+    const {numar_tokeni, id_abonament} = req.body.ob_abonament;
+    const {uid} = req.body;
+
+
+    try{
+        rez = await DBcall('dropTokens', {numar_tokeni, id_abonament, uid});
+        
+        if(!rez.error)res.send(rez.res.rows)
+        if(rez.error)res.status(404).send();
+    }catch (err){
+        res.status(500).send();
+    } 
 
 })
 ///////////////
