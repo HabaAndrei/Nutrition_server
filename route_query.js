@@ -15,19 +15,20 @@ const route_query = {
     },
     delete_user : {
         func : async(oo)=>{
-            const {uid} = oo;
+            const {uid, email} = oo;
             const query = {
                 text: `
                 BEGIN;
                 delete from useri where uid = '${uid}'; 
                 delete from mesaje where uid = '${uid}';
+                update date_abonament set tip = 'inactiv' where email = '${email}' and tip = 'activ' and id_abonament != 'gratis';
                 COMMIT;
                 `,
                 values: []
             }
             return await client_db.query(query);
         },
-        require_params : []
+        require_params : ['uid', 'email']
 
     },
     store_messages: {
@@ -74,6 +75,8 @@ const route_query = {
 
                 IF nr < 1 THEN
                     INSERT INTO useri (email, nume, uid, ora_creare, metoda_creare) VALUES ('${email}', '${name}', '${uid}', ${milisec}, '${metoda_creare}');
+                    insert into date_abonament (email, id_abonament, pret_abonament, numar_tokeni , inceput_abonament, final_abonament, tip )
+                    values ( '${email}', 'gratis', 0, 10, 0, 0, 'activ' );
                 END IF;
 
                 RAISE NOTICE '%', rezultat;

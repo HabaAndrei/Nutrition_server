@@ -40,9 +40,9 @@ app.post('/insertDateU_google', async (req, res)=>{
 
 
 app.post('/stergemUtilizatorul', async (req, res)=>{
-    const {uid} = req.body;
+    const {uid, email} = req.body;
     try{
-        let rez = await DBcall('delete_user', {uid});
+        let rez = await DBcall('delete_user', {uid, email});
         if(rez.error)res.status(404).send();
         try{
             fs.unlinkSync(`./poze/${uid}.jpg`);
@@ -189,6 +189,8 @@ app.post('/dropTokens', async (req, res)=>{
     } 
 
 })
+
+
 ///////////////
 
 const PORT = 5000;
