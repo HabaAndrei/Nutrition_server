@@ -7,7 +7,6 @@ let arAlimente = [
     "pork",
     "bacon",
     "ham",
-    //
     "poultry",
     "buffalo wing",
     "chicken balls",
@@ -20,7 +19,6 @@ let arAlimente = [
     "salmon",
     "shrimp and prawn",
     "shark",
-    //
     "eggs",
     "scrambled egg",
     "sunny side up",
@@ -38,7 +36,6 @@ let arAlimente = [
     "ravioli",
     "carbonara",
     "bolognese",
-    //
     "spaghetti",
     "spaghetti and meatballs",
     "pancit canton",
@@ -65,7 +62,6 @@ let arAlimente = [
     "sandwiches",
     "vegetable sandwich",
     "grilled cheese",
-    //
     "panini",
     "cheeseburgers",
     "bacon cheeseburger",
@@ -142,7 +138,6 @@ let arAlimente = [
     "pierogi",
     "wonton",
     "fruits",
-    //
     "apple",
     "banana",
     "cantaloupe",
