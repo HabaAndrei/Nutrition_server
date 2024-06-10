@@ -12,8 +12,6 @@ const {SK_TEST }= process.env;
 const stripe = require('stripe')(SK_TEST);
 
 
-
-
 const app = express();
 app.use(fileUpload());
 app.use(express.static("./poze"));
