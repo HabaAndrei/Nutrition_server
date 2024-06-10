@@ -1,5 +1,16 @@
-const {client_db} = require('./configPG.js')
+// const {client_db} = require('./configPG.js')
 
+///
+const  {returnClientDB} = require('./client_db.js');
+
+
+let client_db ;
+async function getClient(){
+    client_db = await returnClientDB();
+} 
+getClient()
+
+///
 
 const route_query = {
     verify_free_credit : {
