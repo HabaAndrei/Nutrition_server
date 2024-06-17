@@ -7,7 +7,6 @@ const fs = require("fs");
 const fileUpload = require("express-fileupload");
 const {pay_product_redirect} = require('./pay_redirect.js');
 const {catch_hooks} = require('./catch_hooks.js');
-// const {client_db} = require('./configPG.js');
 const {SK_TEST }= process.env;
 const stripe = require('stripe')(SK_TEST);
 

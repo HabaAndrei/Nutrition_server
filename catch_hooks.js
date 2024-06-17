@@ -3,17 +3,7 @@ require('dotenv').config();
 const {azi_peste_o_luna} = require('./diverse.js')
 const {DBcall} = require('./route_query.js')
 const {SK_TEST }= process.env;
-// const {client_db} = require('./configPG.js');
 
-
-const  {returnClientDB} = require('./client_db.js');
-
-
-let client_db ;
-async function getClient(){
-    client_db = await returnClientDB();
-} 
-getClient()
 
 const produse = [{price: 7, tokens: 100},
   {price: 12, tokens: 300},

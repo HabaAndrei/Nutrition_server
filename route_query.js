@@ -1,16 +1,5 @@
-// const {client_db} = require('./configPG.js')
+const {client_db} = require('./configPG.js')
 
-///
-const  {returnClientDB} = require('./client_db.js');
-
-
-let client_db ;
-async function getClient(){
-    client_db = await returnClientDB();
-} 
-getClient()
-
-///
 
 const route_query = {
     verify_free_credit : {
@@ -246,6 +235,7 @@ async function DBcall (func_str, params={}){
         }
  
         let rezult = await route_query[func_str].func(params);
+        // console.log(rezult, '---------')
         // console.log(rezult, '\n', '\n')
         res = {error:false, res: rezult};
     }catch(err){
